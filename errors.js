@@ -4,3 +4,10 @@ export class CityInputError extends Error{
         this.name = "CityInputError"
     }
 }
+
+export class fetchError extends Error{
+    constructor(message){
+        super(message)
+        this.name = "fetchError"
+    }
+}

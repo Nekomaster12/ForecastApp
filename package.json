@@ -12,6 +12,8 @@
     "date-fns": "^2.29.3"
   },
   "devDependencies": {
+    "eslint": "^8.34.0",
+    "eslint-config-google": "^0.14.0",
     "parcel": "^2.8.3"
   }
 }

@@ -1,10 +1,9 @@
-import { CityInputError } from "./errors.js"
+import { CityInputError, fetchError } from "./errors.js"
 import { API } from "./api.js"
 import { HTML_ELEMENTS } from "./htmlElements.js"
 import { format } from "date-fns"
-import { da } from "date-fns/locale"
 
-HTML_ELEMENTS.CITY_INPUT.value = "Moscow"
+const favouriteCityList = []
 
 function getCityName(){
     let cityName = HTML_ELEMENTS.CITY_INPUT.value.trim()
@@ -28,17 +27,32 @@ function changeWeatherHtml(weather){
     HTML_ELEMENTS.WEATHER.textContent = `Weather: ${weather.weather[0].main}`
     HTML_ELEMENTS.SUNRISE.textContent = `Sunrise: ${format(weather.sys.sunrise*1000, 'H')}:${format(weather.sys.sunrise*1000, 'mm')}`
     HTML_ELEMENTS.SUNSET.textContent = `Sunset: ${format(weather.sys.sunset*1000, 'H')}:${format(weather.sys.sunset*1000, 'mm')}`
-
     changeCityNames();
 }
 
 function sendRequest(){
     getCityName();
     fetch(API.url)
-    .catch((error) => {throw new error})
+    .catch(() => {throw new fetchError("Fetch error.")})
     .then((data) => {
         data.json()
         .then((data) => {changeWeatherHtml(data); console.log(data)})
     })
 }
-HTML_ELEMENTS.FORECAST_FORM.addEventListener('submit', function(event){event.preventDefault(); sendRequest()})
+
+function addToFavouriteCities(){
+    fetch(API.url)
+    .catch(() => {throw new fetchError("City add error.")})
+    .then(() => {
+        if(favouriteCityList.length >= 8){
+            favouriteCityList.shift()
+        }
+        favouriteCityList.unshift(API.cityName)
+        console.log(favouriteCityList)
+    })
+}
+
+
+
+
+HTML_ELEMENTS.FORECAST_FORM.addEventListener('submit', function(event){event.preventDefault(); sendRequest();})
