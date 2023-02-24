@@ -1,13 +1,12 @@
-import { CityInputError, fetchError } from "./errors.js"
+import { cityAddError, CityInputError, fetchError } from "./errors.js"
+import { format } from "./node_modules/date-fns/esm/index.js"
 import { API } from "./api.js"
 import { HTML_ELEMENTS } from "./htmlElements.js"
-import { format } from "date-fns"
-
+import Cookies from "./node_modules/js-cookie/dist/js.cookie.mjs"
 const favouriteCityList = []
-
 function getCityName(){
     let cityName = HTML_ELEMENTS.CITY_INPUT.value.trim()
-    if(!isNaN(Number((cityName))) || cityName.length === 0){
+    if(!isNaN(Number((cityName))) || cityName.length === 0 || cityName.length >= 18){
         throw new CityInputError("wrong city name given")
     }
     API.cityName = cityName
@@ -20,23 +19,26 @@ function changeCityNames(times = 0){
     return changeCityNames(times + 1)
 }
 
+
 function changeWeatherHtml(weather){
     HTML_ELEMENTS.DEGREES_NUM.textContent = Math.round(Number(weather.main.temp) - 273)
     HTML_ELEMENTS.DETAIL_TEMPETURE.textContent = `Tempeture: ${Math.round(Number(weather.main.temp) - 273)}`
     HTML_ELEMENTS.FEELS_LIKE.textContent = `Feels like: ${Math.round(Number(weather.main.feels_like) - 273)}`
     HTML_ELEMENTS.WEATHER.textContent = `Weather: ${weather.weather[0].main}`
-    HTML_ELEMENTS.SUNRISE.textContent = `Sunrise: ${format(weather.sys.sunrise*1000, 'H')}:${format(weather.sys.sunrise*1000, 'mm')}`
-    HTML_ELEMENTS.SUNSET.textContent = `Sunset: ${format(weather.sys.sunset*1000, 'H')}:${format(weather.sys.sunset*1000, 'mm')}`
+    HTML_ELEMENTS.SUNRISE.textContent = `Sunrise: ${format(weather.sys.sunrise*1000, "H")}:${format(weather.sys.sunrise*1000, "mm")}`
+    HTML_ELEMENTS.SUNSET.textContent = `Sunset: ${format(weather.sys.sunset*1000, "H")}:${format(weather.sys.sunset*1000, "mm")}`
     changeCityNames();
 }
-
 function sendRequest(){
     getCityName();
     fetch(API.url)
     .catch(() => {throw new fetchError("Fetch error.")})
     .then((data) => {
+        if(data.status !== 200){
+            throw new fetchError("Fetch error.")
+        }
         data.json()
-        .then((data) => {changeWeatherHtml(data); console.log(data)})
+        .then((data) => {changeWeatherHtml(data)})
     })
 }
 
@@ -44,15 +46,61 @@ function addToFavouriteCities(){
     fetch(API.url)
     .catch(() => {throw new fetchError("City add error.")})
     .then(() => {
-        if(favouriteCityList.length >= 8){
-            favouriteCityList.shift()
+        if(favouriteCityList.includes(API.cityName)){
+            throw new cityAddError(API.cityName)
         }
-        favouriteCityList.unshift(API.cityName)
-        console.log(favouriteCityList)
+        if(favouriteCityList.length >= 7){
+            favouriteCityList.pop()
+        }
+        favouriteCityList.push(API.cityName)
+        renderFavoriteList()
     })
+}
+
+function clearHtmlFavouriteList(){
+    if(HTML_ELEMENTS.FAVORITE_LIST.childNodes.length === 0){
+        return
+    }
+    for(let item of HTML_ELEMENTS.FAVORITE_LIST.childNodes){
+        item.remove()
+    }
+    return clearHtmlFavouriteList()
+}
+
+function deleteFavoriteCity(city){
+    let cityName = city.textContent
+    if(favouriteCityList.includes(cityName)){
+        favouriteCityList.splice(favouriteCityList.indexOf(cityName), 1)
+        city.parentElement.remove()
+    }
+
+}
+  
+
+function renderFavoriteList(){
+    clearHtmlFavouriteList()
+    for(let item of favouriteCityList){
+        let city = document.createElement("li")
+        city.textContent = item
+        city.addEventListener("click", () => {showFavouriteCityWeather(item)})
+        let container = document.createElement("div")
+        container.className = "fav-container"
+        let closer = document.createElement("div")
+        closer.className = "closer"
+        closer.textContent = "✕"
+        closer.addEventListener("click",function(){deleteFavoriteCity(city)})
+        HTML_ELEMENTS.FAVORITE_LIST.append(container)
+        container.append(city)
+        container.prepend(closer)
+    }
+}
+
+function showFavouriteCityWeather(element){
+    HTML_ELEMENTS.CITY_INPUT.value = element
+    sendRequest();
 }
 
 
 
-
-HTML_ELEMENTS.FORECAST_FORM.addEventListener('submit', function(event){event.preventDefault(); sendRequest();})
+HTML_ELEMENTS.FORECAST_FORM.addEventListener("submit", function(event){event.preventDefault(); sendRequest();})
+HTML_ELEMENTS.HEART_ICON.addEventListener("click", function(){addToFavouriteCities()})

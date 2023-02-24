@@ -11,3 +11,10 @@ export class fetchError extends Error{
         this.name = "fetchError"
     }
 }
+
+export class cityAddError extends Error{
+    constructor(city){
+        super(`City ${city} is already in favourites.`)
+        this.name = "cityAddError"
+    }
+}

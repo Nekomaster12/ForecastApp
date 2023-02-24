@@ -175,7 +175,12 @@ span {
 }
 
 li {
-    margin: 14px 0;
+    margin: 5px 0; display: inline-block;
+}
+.closer{
+    display: inline-block;
+    margin: 5px;
+    float: right;
 }
 
 .forecast {

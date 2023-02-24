@@ -1,0 +1,4 @@
+.parcel-cashe
+.vscode
+dist
+node_modules
