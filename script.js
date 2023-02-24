@@ -31,7 +31,11 @@ function changeWeatherHtml(weather){
     changeCityNames();
 }
 function sendRequest(){
-    getCityName();
+    try {
+        getCityName();
+    } catch (error) {
+        throw error
+    }
     fetch(API.url)
     .catch(() => {throw new fetchError("Fetch error.")})
     .then((data) => {
@@ -111,5 +115,5 @@ function renderCookies(){
     renderFavoriteList()
 }
 
-HTML_ELEMENTS.FORECAST_FORM.addEventListener("submit", function(event){event.preventDefault(); sendRequest();})
-HTML_ELEMENTS.HEART_ICON.addEventListener("click", function(){addToFavouriteCities()})
+HTML_ELEMENTS.FORECAST_FORM.addEventListener("submit", function(event){event.preventDefault();sendRequest()})
+HTML_ELEMENTS.HEART_ICON.addEventListener("click", addToFavouriteCities)
