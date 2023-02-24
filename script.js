@@ -4,6 +4,8 @@ import { API } from "./api.js"
 import { HTML_ELEMENTS } from "./htmlElements.js"
 import Cookies from "./node_modules/js-cookie/dist/js.cookie.mjs"
 const favouriteCityList = []
+renderCookies()
+
 function getCityName(){
     let cityName = HTML_ELEMENTS.CITY_INPUT.value.trim()
     if(!isNaN(Number((cityName))) || cityName.length === 0 || cityName.length >= 18){
@@ -18,7 +20,6 @@ function changeCityNames(times = 0){
     HTML_ELEMENTS.CITY_NAMES[times].textContent = API.cityName
     return changeCityNames(times + 1)
 }
-
 
 function changeWeatherHtml(weather){
     HTML_ELEMENTS.DEGREES_NUM.textContent = Math.round(Number(weather.main.temp) - 273)
@@ -50,9 +51,10 @@ function addToFavouriteCities(){
             throw new cityAddError(API.cityName)
         }
         if(favouriteCityList.length >= 7){
-            favouriteCityList.pop()
+            Cookies.remove(favouriteCityList.pop())
         }
         favouriteCityList.push(API.cityName)
+        Cookies.set(API.cityName,API.cityName)
         renderFavoriteList()
     })
 }
@@ -71,6 +73,7 @@ function deleteFavoriteCity(city){
     let cityName = city.textContent
     if(favouriteCityList.includes(cityName)){
         favouriteCityList.splice(favouriteCityList.indexOf(cityName), 1)
+        Cookies.remove(cityName)
         city.parentElement.remove()
     }
 
@@ -100,7 +103,13 @@ function showFavouriteCityWeather(element){
     sendRequest();
 }
 
-
+function renderCookies(){
+    let cookies = Cookies.get()
+    for(let item in cookies){
+        favouriteCityList.push(item)
+    }
+    renderFavoriteList()
+}
 
 HTML_ELEMENTS.FORECAST_FORM.addEventListener("submit", function(event){event.preventDefault(); sendRequest();})
 HTML_ELEMENTS.HEART_ICON.addEventListener("click", function(){addToFavouriteCities()})
