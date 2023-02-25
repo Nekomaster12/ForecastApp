@@ -3,9 +3,15 @@ import {
     CityInputError,
     fetchError
 } from "./errors.js"
-import format from "./node_modules/date-fns/esm/index.js"
-import  API from "./api.js"
-import HTML_ELEMENTS from "./htmlElements.js"
+import {
+    format
+} from "./node_modules/date-fns/esm/index.js"
+import {
+    API
+} from "./api.js"
+import {
+    HTML_ELEMENTS
+} from "./htmlElements.js"
 import Cookies from "./node_modules/js-cookie/dist/js.cookie.mjs"
 const favouriteCityList = []
 renderCookies()
@@ -95,7 +101,7 @@ function clearHtmlFavouriteList() {
 }
 
 function deleteFavoriteCity(city) {
-    let cityName = city.textContent
+    const cityName = city.textContent
     if (favouriteCityList.includes(cityName)) {
         favouriteCityList.splice(favouriteCityList.indexOf(cityName), 1)
         Cookies.remove(cityName)
@@ -107,14 +113,14 @@ function deleteFavoriteCity(city) {
 function renderFavoriteList() {
     clearHtmlFavouriteList()
     for (let item of favouriteCityList) {
-        let city = document.createElement("li")
+        const city = document.createElement("li")
         city.textContent = item
         city.addEventListener("click", () => {
             showFavouriteCityWeather(item)
         })
-        let container = document.createElement("div")
+        const container = document.createElement("div")
         container.className = "fav-container"
-        let closer = document.createElement("div")
+        const closer = document.createElement("div")
         closer.className = "closer"
         closer.textContent = "✕"
         closer.addEventListener("click", function () {
@@ -132,7 +138,7 @@ function showFavouriteCityWeather(element) {
 }
 
 function renderCookies() {
-    let cookies = Cookies.get()
+    const cookies = Cookies.get()
     for (let item in cookies) {
         favouriteCityList.push(item)
     }
