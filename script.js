@@ -6,13 +6,22 @@ import Cookies from "./node_modules/js-cookie/dist/js.cookie.mjs"
 const favouriteCityList = []
 renderCookies()
 
-function getCityName(){
-    let cityName = HTML_ELEMENTS.CITY_INPUT.value.trim()
-    if(!isNaN(Number((cityName))) || cityName.length === 0 || cityName.length >= 18){
-        throw new CityInputError("wrong city name given")
-    }
+function updateApiData(cityName){
     API.cityName = cityName
     API.url = `${API.serverUrl}?q=${API.cityName}&appid=${API.apiKey}`
+}
+
+function isCityNameCorrect(cityName){
+    return(isNaN(Number((cityName))) || cityName.length !== 0 || cityName.length < 18)
+}
+
+function getCityName(){
+    const cityName = HTML_ELEMENTS.CITY_INPUT.value.trim()
+    if(isCityNameCorrect()){
+        updateApiData(cityName)
+    }else{
+        throw new CityInputError("wrong city name given")
+    }
 }
 
 function changeCityNames(times = 0){
@@ -34,37 +43,39 @@ function changeWeatherHtml(weather){
 }
 
 function sendRequest(){
-    try {
+    try{
         getCityName();
-    } catch (error) {
+    } catch(error){
         alert(error)
     }
-    
+
+    const error = new fetchError("Fetch error.")
     fetch(API.url)
-    .catch(() => {throw new fetchError("Fetch error.")})
     .then((data) => {
         if(data.status !== 200){
             throw new fetchError("Fetch error.")
         }
         data.json()
-        .then((data) => {changeWeatherHtml(data)})
+        .then(
+            function(data){
+                changeWeatherHtml(data)
+            }
+        )
     })
-}
+    .catch(() => alert(error))
+    }
 
 function addToFavouriteCities(){
-    fetch(API.url)
-    .catch(() => {throw new fetchError("City add error.")})
-    .then(() => {
-        if(favouriteCityList.includes(API.cityName)){
-            throw new cityAddError(API.cityName)
-        }
-        if(favouriteCityList.length >= 7){
-            Cookies.remove(favouriteCityList.pop())
-        }
+    if(favouriteCityList.includes(API.cityName)){
+        alert(new cityAddError(API.cityName))
+        return;
+    }
+    if(favouriteCityList.length >= 7){
+        Cookies.remove(favouriteCityList.pop())
+    }
         favouriteCityList.push(API.cityName)
         Cookies.set(API.cityName,API.cityName)
         renderFavoriteList()
-    })
 }
 
 
@@ -85,7 +96,6 @@ function deleteFavoriteCity(city){
         Cookies.remove(cityName)
         city.parentElement.remove()
     }
-
 }
   
 
@@ -120,5 +130,6 @@ function renderCookies(){
     renderFavoriteList()
 }
 
-HTML_ELEMENTS.FORECAST_FORM.addEventListener("submit", function(event){event.preventDefault();sendRequest()})
+
+HTML_ELEMENTS.FORECAST_FORM.addEventListener("submit", function(event){event.preventDefault(); sendRequest()})
 HTML_ELEMENTS.HEART_ICON.addEventListener("click", addToFavouriteCities)
