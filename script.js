@@ -54,7 +54,10 @@ function changeWeatherHtml(weather) {
     changeCityNames();
 }
 
-function sendRequest() {
+function sendRequest(event) {
+    if(event){
+        event.preventDefault()
+    }
     try {
         getCityName();
     } catch (error) {
@@ -146,8 +149,5 @@ function renderCookies() {
 }
 
 
-HTML_ELEMENTS.FORECAST_FORM.addEventListener("submit", function (event) {
-    event.preventDefault();
-    sendRequest()
-})
+HTML_ELEMENTS.FORECAST_FORM.addEventListener("submit", sendRequest)
 HTML_ELEMENTS.HEART_ICON.addEventListener("click", addToFavouriteCities)
