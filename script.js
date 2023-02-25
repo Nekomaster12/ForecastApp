@@ -3,15 +3,9 @@ import {
     CityInputError,
     fetchError
 } from "./errors.js"
-import {
-    format
-} from "./node_modules/date-fns/esm/index.js"
-import {
-    API
-} from "./api.js"
-import {
-    HTML_ELEMENTS
-} from "./htmlElements.js"
+import format from "./node_modules/date-fns/esm/index.js"
+import  API from "./api.js"
+import HTML_ELEMENTS from "./htmlElements.js"
 import Cookies from "./node_modules/js-cookie/dist/js.cookie.mjs"
 const favouriteCityList = []
 renderCookies()
@@ -89,7 +83,6 @@ function addToFavouriteCities() {
     Cookies.set(API.cityName, API.cityName)
     renderFavoriteList()
 }
-
 
 function clearHtmlFavouriteList() {
     if (HTML_ELEMENTS.FAVORITE_LIST.childNodes.length === 0) {
