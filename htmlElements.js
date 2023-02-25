@@ -1,5 +1,5 @@
 export const HTML_ELEMENTS = {
-    CITY_INPUT : document.querySelector("#cityInput"),
+    CITY_INPUT: document.querySelector("#cityInput"),
     FORECAST_FORM: document.querySelector("#forecast-form"),
     CITY_NAMES: document.querySelectorAll(".cityName"),
     FAVORITE_LIST: document.querySelector(".locations-items"),
