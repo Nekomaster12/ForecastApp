@@ -22,20 +22,24 @@ function changeCityNames(times = 0){
 }
 
 function changeWeatherHtml(weather){
-    HTML_ELEMENTS.DEGREES_NUM.textContent = Math.round(Number(weather.main.temp) - 273)
-    HTML_ELEMENTS.DETAIL_TEMPETURE.textContent = `Tempeture: ${Math.round(Number(weather.main.temp) - 273)}`
-    HTML_ELEMENTS.FEELS_LIKE.textContent = `Feels like: ${Math.round(Number(weather.main.feels_like) - 273)}`
+    const kelvinDegrees = 273
+    const toMiliseconds = 1000
+    HTML_ELEMENTS.DEGREES_NUM.textContent = Math.round(Number(weather.main.temp) - kelvinDegrees)
+    HTML_ELEMENTS.DETAIL_TEMPETURE.textContent = `Tempeture: ${Math.round(Number(weather.main.temp) - kelvinDegrees)}`
+    HTML_ELEMENTS.FEELS_LIKE.textContent = `Feels like: ${Math.round(Number(weather.main.feels_like) - kelvinDegrees)}`
     HTML_ELEMENTS.WEATHER.textContent = `Weather: ${weather.weather[0].main}`
-    HTML_ELEMENTS.SUNRISE.textContent = `Sunrise: ${format(weather.sys.sunrise*1000, "H")}:${format(weather.sys.sunrise*1000, "mm")}`
-    HTML_ELEMENTS.SUNSET.textContent = `Sunset: ${format(weather.sys.sunset*1000, "H")}:${format(weather.sys.sunset*1000, "mm")}`
+    HTML_ELEMENTS.SUNRISE.textContent = `Sunrise: ${format(weather.sys.sunrise * toMiliseconds, "H")}:${format(weather.sys.sunrise * toMiliseconds, "mm")}`
+    HTML_ELEMENTS.SUNSET.textContent = `Sunset: ${format(weather.sys.sunset * toMiliseconds, "H")}:${format(weather.sys.sunset * toMiliseconds, "mm")}`
     changeCityNames();
 }
+
 function sendRequest(){
     try {
         getCityName();
     } catch (error) {
-        throw error
+        alert(error)
     }
+    
     fetch(API.url)
     .catch(() => {throw new fetchError("Fetch error.")})
     .then((data) => {
@@ -62,6 +66,7 @@ function addToFavouriteCities(){
         renderFavoriteList()
     })
 }
+
 
 function clearHtmlFavouriteList(){
     if(HTML_ELEMENTS.FAVORITE_LIST.childNodes.length === 0){
